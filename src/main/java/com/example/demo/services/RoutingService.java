@@ -2,6 +2,8 @@ package com.example.demo.services;
 
 import com.example.demo.dto.RouteRequest;
 import com.example.demo.dto.RouteResponse;
+import com.example.demo.models.BlockedEdgeRef;
+import com.example.demo.models.RoadEdge;
 import com.example.demo.models.GraphWeightType;
 import com.example.demo.models.RoadGraph;
 import com.example.demo.models.RoadNode;
@@ -45,12 +47,80 @@ public class RoutingService {
 
         log.info("route nodes {} {}", startNode.getId(), endNode.getId());
 
-        RouteResult routeResult = runAlgorithm(
-                graph,
-                startNode,
-                endNode,
-                request.algorithm()
-        );
+        RouteResult routeResult;
+        double displayWeight;
+
+        synchronized (graph) {
+            if (request.alternative() != null && request.alternative()) {
+                // Чтобы найти альтернативный путь, сначала находим основной
+                RouteResult primaryResult = runAlgorithm(
+                        graph,
+                        startNode,
+                        endNode,
+                        request.algorithm()
+                );
+
+                if (primaryResult.isPathFound() && primaryResult.getPath().size() > 1) {
+                    List<RoadNode> primaryPath = primaryResult.getPath();
+                    List<OriginalEdgeWeight> penalizedEdges = new ArrayList<>();
+
+                    // Временно увеличиваем вес ребер основного пути в 10 раз (в обе стороны)
+                    for (int i = 0; i < primaryPath.size() - 1; i++) {
+                        RoadNode from = primaryPath.get(i);
+                        RoadNode to = primaryPath.get(i + 1);
+
+                        // Пенализируем в прямом направлении
+                        for (RoadEdge edge : graph.getEdgesFrom(from)) {
+                            if (edge.getTarget().equals(to)) {
+                                double orig = edge.getWeight();
+                                edge.setWeight(orig * 10.0);
+                                penalizedEdges.add(new OriginalEdgeWeight(edge, orig));
+                            }
+                        }
+
+                        // Пенализируем в обратном направлении
+                        for (RoadEdge edge : graph.getEdgesFrom(to)) {
+                            if (edge.getTarget().equals(from)) {
+                                double orig = edge.getWeight();
+                                edge.setWeight(orig * 10.0);
+                                penalizedEdges.add(new OriginalEdgeWeight(edge, orig));
+                            }
+                        }
+                    }
+
+                    try {
+                        // Рассчитываем альтернативный путь на графе с пенальти
+                        routeResult = runAlgorithm(
+                                graph,
+                                startNode,
+                                endNode,
+                                request.algorithm()
+                        );
+                    } finally {
+                        // Восстанавливаем исходные веса ребер графа
+                        for (OriginalEdgeWeight record : penalizedEdges) {
+                            record.edge().setWeight(record.originalWeight());
+                        }
+                    }
+                } else {
+                    routeResult = primaryResult;
+                }
+            } else {
+                routeResult = runAlgorithm(
+                        graph,
+                        startNode,
+                        endNode,
+                        request.algorithm()
+                );
+            }
+
+            // Рассчитываем реальный вес пути без учета пенальти для отображения
+            if (request.alternative() != null && request.alternative() && routeResult.isPathFound()) {
+                displayWeight = calculatePathWeight(graph, routeResult.getPath());
+            } else {
+                displayWeight = routeResult.getTotalWeight();
+            }
+        }
 
         if (!routeResult.isPathFound()) {
             log.error("route not found");
@@ -58,12 +128,35 @@ public class RoutingService {
 
         return new RouteResponse(
                 routeResult.isPathFound(),
-                routeResult.getTotalWeight(),
+                displayWeight,
                 routeResult.getVisitedNodes(),
                 routeResult.getRelaxedEdges(),
                 routeResult.getExecutionTimeNanos(),
                 toPoints(routeResult.getPath())
         );
+    }
+
+    private double calculatePathWeight(RoadGraph graph, List<RoadNode> path) {
+        double total = 0.0;
+        for (int i = 0; i < path.size() - 1; i++) {
+            RoadNode from = path.get(i);
+            RoadNode to = path.get(i + 1);
+            double minWeight = Double.MAX_VALUE;
+            boolean found = false;
+            for (RoadEdge edge : graph.getEdgesFrom(from)) {
+                if (edge.getTarget().equals(to)) {
+                    minWeight = Math.min(minWeight, edge.getWeight());
+                    found = true;
+                }
+            }
+            if (found) {
+                total += minWeight;
+            }
+        }
+        return total;
+    }
+
+    private record OriginalEdgeWeight(RoadEdge edge, double originalWeight) {
     }
 
     private RoadGraph selectGraph(String weightTypeValue) {

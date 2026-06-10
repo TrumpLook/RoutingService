@@ -4,13 +4,14 @@ export default function ControlPanel({
   isLoading,
   error,
   onWeightTypeChange,
-  onReset
+  onReset,
+  showAlternative,
+  onShowAlternativeChange
 }) {
   return (
     <aside className="panel">
       <div className="panel-block">
-        <p className="eyebrow">Routing Lab</p>
-        <h1>Сравнение алгоритмов маршрутизации</h1>
+        <h1>Web приложение для построения логистических маршрутов</h1>
         <p className="panel-text">
           Выбери тип веса и кликни две точки на карте. Маршруты Дейкстры и A* построятся сразу.
         </p>
@@ -25,7 +26,16 @@ export default function ControlPanel({
           </select>
         </label>
 
-        <button className="reset-button" type="button" onClick={onReset}>
+        <label className="field-checkbox">
+          <input
+            type="checkbox"
+            checked={showAlternative}
+            onChange={(event) => onShowAlternativeChange(event.target.checked)}
+          />
+          <span>Альтернативный путь</span>
+        </label>
+
+        <button className="reset-button" type="button" onClick={onReset} style={{ marginTop: "1rem" }}>
           Сбросить точки
         </button>
       </div>
@@ -47,6 +57,12 @@ export default function ControlPanel({
             <span className="legend-line legend-line-blue"></span>
             <span>A*</span>
           </div>
+          {showAlternative ? (
+            <div className="legend-item">
+              <span className="legend-line legend-line-green"></span>
+              <span>Альтернативный путь</span>
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -67,6 +83,13 @@ export default function ControlPanel({
           <p className="panel-text">Пока нет рассчитанного маршрута.</p>
         )}
       </div>
+
+      {showAlternative && routeInfo?.alternative ? (
+        <div className="panel-block">
+          <h2>Альтернативный путь</h2>
+          <Metrics routeInfo={routeInfo.alternative} />
+        </div>
+      ) : null}
     </aside>
   );
 }

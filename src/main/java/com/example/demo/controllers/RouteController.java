@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/route")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
 public class RouteController {
     private static final Logger log = LoggerFactory.getLogger(RouteController.class);
 

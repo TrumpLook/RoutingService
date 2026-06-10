@@ -1,9 +1,6 @@
 :root {
-  color: #f6f2ea;
-  background:
-    radial-gradient(circle at top left, rgba(234, 120, 64, 0.28), transparent 30%),
-    radial-gradient(circle at bottom right, rgba(48, 94, 128, 0.26), transparent 28%),
-    linear-gradient(135deg, #191919 0%, #22252b 45%, #101112 100%);
+  color: #0f172a; /* Slate 900 */
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); /* Light modern slate gradient */
   font-family: "Segoe UI", "Trebuchet MS", sans-serif;
   line-height: 1.4;
   font-weight: 400;
@@ -39,21 +36,21 @@ select {
   flex-direction: column;
   gap: 1rem;
   padding: 1.5rem;
-  background: rgba(11, 13, 16, 0.78);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(18px);
+  background: #f8fafc; /* Slate 50 background */
+  border-right: 1px solid #cbd5e1; /* Clear borders */
 }
 
 .panel-block {
   padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #cbd5e1; /* Highly defined slate-300 border */
+  border-radius: 16px;
+  background: #ffffff; /* Solid white background for high contrast */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .eyebrow {
   margin: 0 0 0.5rem;
-  color: #f0b17a;
+  color: #c2410c; /* Deep orange accent */
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-size: 0.72rem;
@@ -69,17 +66,19 @@ select {
   margin-bottom: 0.75rem;
   font-size: 2rem;
   line-height: 1.05;
+  color: #0f172a;
 }
 
 .panel h2 {
   margin-bottom: 0.85rem;
   font-size: 1rem;
+  color: #1e293b;
 }
 
 .panel-text,
 .status-line,
 .metrics dt {
-  color: rgba(246, 242, 234, 0.74);
+  color: #475569; /* Slate 600 */
 }
 
 .field {
@@ -91,29 +90,41 @@ select {
 
 .field span {
   font-size: 0.92rem;
+  color: #1e293b;
 }
 
 .field select,
 .reset-button {
   padding: 0.85rem 0.95rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 12px;
-  color: #f6f2ea;
-  background: rgba(255, 255, 255, 0.06);
+  color: #0f172a;
+  background: #ffffff;
 }
 
 .reset-button {
   width: 100%;
   cursor: pointer;
-  background: linear-gradient(135deg, #de5b31, #d28b2b);
+  background: linear-gradient(135deg, #f97316, #ea580c); /* Vibrant orange gradient */
   border: none;
-  color: #171717;
+  color: #ffffff;
   font-weight: 700;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.25);
+  transition: all 0.2s ease;
+}
+
+.reset-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.35);
+}
+
+.reset-button:active {
+  transform: translateY(0);
 }
 
 .error-text {
   margin-bottom: 0;
-  color: #ff8f8f;
+  color: #dc2626; /* Red 600 */
 }
 
 .metrics {
@@ -127,12 +138,13 @@ select {
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 0.55rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .metrics dd {
   margin: 0;
   font-weight: 700;
+  color: #0f172a;
 }
 
 .legend {
@@ -144,6 +156,7 @@ select {
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  color: #334155;
 }
 
 .legend-line {
@@ -173,8 +186,9 @@ select {
   height: calc(100vh - 2rem);
   padding: 0.75rem;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  background: #ffffff; /* Solid white background */
+  border: 1px solid #cbd5e1; /* High-contrast border matching panels */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 }
 
 .map {
@@ -182,6 +196,7 @@ select {
   width: 100%;
   border-radius: 18px;
   overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
 }
 
 .event-popup {
@@ -209,7 +224,7 @@ select {
 
   .panel {
     border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   .canvas {
@@ -219,4 +234,66 @@ select {
   .map-shell {
     height: 70vh;
   }
+}
+
+/* Скрываем логотип Leaflet и флаг/ссылку в копирайте, оставляя только OpenStreetMap */
+.leaflet-control-attribution a[href*="leafletjs.com"] {
+  display: none !important;
+}
+.leaflet-control-attribution-divider {
+  display: none !important;
+}
+
+.legend-line-green {
+  background: #10b981;
+}
+
+.field-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  color: #1e293b;
+}
+
+.field-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #10b981;
+  cursor: pointer;
+}
+
+.custom-marker-a,
+.custom-marker-b {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker-label-a,
+.marker-label-b {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 14px;
+  font-family: system-ui, -apple-system, sans-serif;
+  border: 2px solid #ffffff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.marker-label-a {
+  background: #2f7df6; /* Blue for start A */
+}
+
+.marker-label-b {
+  background: #de5b31; /* Orange for end B */
 }

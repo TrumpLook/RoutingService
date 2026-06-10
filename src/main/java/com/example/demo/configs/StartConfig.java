@@ -24,6 +24,9 @@ public class StartConfig {
 
     private final GraphStorage graphStorage;
 
+    @org.springframework.beans.factory.annotation.Value("${app.map-file-name:map.osm}")
+    private String mapFileName;
+
     public StartConfig(GraphStorage graphStorage) {
         this.graphStorage = graphStorage;
     }
@@ -31,12 +34,12 @@ public class StartConfig {
     @SneakyThrows
     @PostConstruct
     public void init() throws ParserConfigurationException, SAXException {
-        log.info("map load");
+        log.info("map load: {}", mapFileName);
 
         SAXParserFactory factory = SAXParserFactory.newInstance();
         SAXParser saxParser = factory.newSAXParser();
         OSMParser handler = new OSMParser();
-        saxParser.parse(new File("Moscow.osm"), handler);
+        saxParser.parse(new File(mapFileName), handler);
 
         RoadGraph timeGraph = GraphBuilder.buildTimeGraph(
                 handler.getListOfNodes(),

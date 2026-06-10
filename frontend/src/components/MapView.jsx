@@ -9,6 +9,20 @@ const blockedRoadIcon = L.divIcon({
   popupAnchor: [0, -8]
 });
 
+const startIcon = L.divIcon({
+  className: "custom-marker-a",
+  html: '<div class="marker-label-a">A</div>',
+  iconSize: [32, 32],
+  iconAnchor: [16, 16]
+});
+
+const endIcon = L.divIcon({
+  className: "custom-marker-b",
+  html: '<div class="marker-label-b">B</div>',
+  iconSize: [32, 32],
+  iconAnchor: [16, 16]
+});
+
 function ClickHandler({ onMapClick }) {
   useMapEvents({
     click(event) {
@@ -19,9 +33,10 @@ function ClickHandler({ onMapClick }) {
   return null;
 }
 
-export default function MapView({ startPoint, endPoint, routeInfo, activeEvents, onMapClick }) {
+export default function MapView({ startPoint, endPoint, routeInfo, activeEvents, onMapClick, showAlternative }) {
   const dijkstraPositions = (routeInfo?.dijkstra?.points ?? []).map((point) => [point.lat, point.lon]);
   const aStarPositions = (routeInfo?.astar?.points ?? []).map((point) => [point.lat, point.lon]);
+  const alternativePositions = (routeInfo?.alternative?.points ?? []).map((point) => [point.lat, point.lon]);
 
   return (
     <div className="map-shell">
@@ -31,8 +46,8 @@ export default function MapView({ startPoint, endPoint, routeInfo, activeEvents,
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <ClickHandler onMapClick={onMapClick} />
-        {startPoint ? <Marker position={[startPoint.lat, startPoint.lon]} /> : null}
-        {endPoint ? <Marker position={[endPoint.lat, endPoint.lon]} /> : null}
+        {startPoint ? <Marker position={[startPoint.lat, startPoint.lon]} icon={startIcon} /> : null}
+        {endPoint ? <Marker position={[endPoint.lat, endPoint.lon]} icon={endIcon} /> : null}
         {activeEvents.map((event) => (
           <Marker
             key={`${event.eventId}-${event.nodeId}`}
@@ -60,7 +75,16 @@ export default function MapView({ startPoint, endPoint, routeInfo, activeEvents,
             lineCap="round"
           />
         ) : null}
+        {showAlternative && alternativePositions.length > 1 ? (
+          <Polyline
+            positions={alternativePositions}
+            color="#10b981"
+            weight={5}
+            opacity={0.85}
+          />
+        ) : null}
       </MapContainer>
     </div>
   );
 }
+

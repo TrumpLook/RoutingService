@@ -6,6 +6,8 @@ public record RouteRequest(
         double endLat,
         double endLon,
         String algorithm,
-        String weightType
+        String weightType,
+        Boolean alternative
 ) {
 }
+
